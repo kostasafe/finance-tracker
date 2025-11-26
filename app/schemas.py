@@ -15,7 +15,7 @@ class UserOut(BaseModel):
 
 
     class Config:
-        orm_mode = True
+        orm_mode = True #lets Pydantic read SQLAlchemy models
     
 
 class Token(BaseModel):
