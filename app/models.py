@@ -12,7 +12,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     categories = relationship("Category",back_populates="owner", cascade="all, delete-orphan")
-
+    transactions = relationship("Transaction", back_populates="owner", cascade="all, delete-orphan")
 
 class Category(Base):
     __tablename__ = "categories"
@@ -22,7 +22,7 @@ class Category(Base):
     type = Column(String(10), nullable=False)  # 'income' or 'expense'
 
     owner = relationship("User", back_populates="categories")
-    transactions = relationship("Transaction", back_populates="category")
+    transactions = relationship("Transaction", back_populates="category", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
