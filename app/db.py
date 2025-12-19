@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv() #load .env file 
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./dev.db")
+DATABASE_URL = "sqlite:///./dev.db"
 
 #create sqlAlchemy engine
 engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+    DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
 #session factory for DB sessions

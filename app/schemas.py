@@ -7,6 +7,9 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: constr(min_length=6)
 
+class UserLogin(BaseModel):
+    identifier: str
+    password: str
 
 class UserOut(BaseModel):
     id:int
@@ -15,7 +18,7 @@ class UserOut(BaseModel):
 
 
     class Config:
-        orm_mode = True #lets Pydantic read SQLAlchemy models
+        from_attributes = True #lets Pydantic read SQLAlchemy models
     
 
 class Token(BaseModel):
