@@ -9,7 +9,7 @@ load_dotenv()
 app = FastAPI(title="Finance Tracker")
 
 #import and include routers
-from app.routes import auth as auth_router #relative import of the file you created
+from app.routes import auth as auth_router 
 app.include_router(auth_router.router)
 
 @app.get("/")
