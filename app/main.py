@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
 import os
+from app import models
+from app.db import engine, Base
 
 load_dotenv()
 
@@ -13,3 +15,6 @@ app.include_router(auth_router.router)
 @app.get("/")
 def root():
     return {"message": "Hello Finance Tracker GG!"}
+
+#create models for tables
+Base.metadata.create_all(bind=engine)
