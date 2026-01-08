@@ -5,7 +5,7 @@ The project is currently under development and not yet feature-complete. It serv
 
 ---
 
-## 🚧 Project Status: In Progress
+# 🚧 Project Status: In Progress
 
 ### ✅ Completed So Far
 - Project structure created  
