@@ -74,4 +74,7 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
             detail="Invalid credentials"
         )
     
-    return {"message" : "login successful"}
+    return {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "token_type": "bearer"
+           }
