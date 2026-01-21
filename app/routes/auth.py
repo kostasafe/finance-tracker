@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app import models
 from app.db import SessionLocal
 from app.schemas import UserCreate, UserOut, UserLogin
 from app.security import hash_password, verify_password, create_access_token
 from datetime import timedelta
+from app.dependencies.auth import get_current_user
+from app.models import User
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -19,37 +22,20 @@ def get_db():
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db:Session = Depends(get_db)):
-    # check if username or email exists
-    existing_username = (
-        db.query(models.User)
-        .filter(models.User.username == user_in.username)
-        .first()
-    )
-
-    if existing_username:
-        raise HTTPException(
-            status_code=400,
-            detail="username already taken"
-        )
-
-    # check email ONLY if provided
+    # check if username exists
+    if db.query(models.User).filter(models.User.username == user_in.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+     # check email ONLY if provided
     if user_in.email:
-        existing_email = (
-            db.query(models.User)
-            .filter(models.User.email == user_in.email)
-            .first()
-        )
-        if existing_email:
-            raise HTTPException(
-                status_code=400,
-                detail="email already taken"
-            )
+        if db.query(models.User).filter(models.User.email == user_in.email).first():
+            raise HTTPException(status_code=400, detail="Email already taken")
 
     # create user
     user = models.User(
         username=user_in.username,
         email=user_in.email,
-        password_hash=hash_password(user_in.password)
+        password_hash=hash_password(user_in.password),
     )
 
     db.add(user)
@@ -59,14 +45,20 @@ def register(user_in: UserCreate, db:Session = Depends(get_db)):
     return user
 
 @router.post("/login")
-def login(data: UserLogin, db: Session = Depends(get_db)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
     user = db.query(models.User).filter(
-        (models.User.username == data.identifier) |
-        (models.User.email == data.identifier)
+        (models.User.username == form_data.username) 
+        | (models.User.email == form_data.username)
     ).first()
 
-    if not user or not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not user or not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
     
     access_token = create_access_token(data={"sub": str(user.id)})
 
@@ -74,3 +66,12 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
             "access_token": access_token,
             "token_type": "bearer"
            }
+
+@router.get("/me")
+def read_me(current_user: User = Depends(get_current_user)):
+    return{
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "created_at": current_user.created_at,
+    }

@@ -1,14 +1,16 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
+import os
+
+#JWT config
+SECRET_KEY =os.getenv("SECRET_KEY", "super-secret-dev-key")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 #password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-#JWT config
-SECRET_KEY = "CHANGE_ME_TO_SOMETING_RANDOM"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
