@@ -5,6 +5,7 @@ from app.db import Base
 
 class User(Base):
     __tablename__ = "users"
+
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(64), unique=True, nullable=False, index=True)
     email = Column(String(120), unique=True, nullable=True, index=True)
@@ -16,6 +17,7 @@ class User(Base):
 
 class Category(Base):
     __tablename__ = "categories"
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     name = Column(String(64), nullable=False)
@@ -27,6 +29,7 @@ class Category(Base):
 
 class Transaction(Base):
     __tablename__ = "transactions"
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
