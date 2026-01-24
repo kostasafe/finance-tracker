@@ -2,7 +2,7 @@
 
 ---
 
-# Finance-Tracker (Work in Progress)
+# Finance-Tracker Application
 
 This repository contains the backend for an authentication system built with **FastAPI**.  
 The project is currently under development and not yet feature-complete. It serves as the foundation for user registration, login, and future secure API operations.
