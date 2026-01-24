@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, constr
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 
 class UserCreate(BaseModel):
@@ -24,3 +24,16 @@ class UserOut(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class CategoryBase(BaseModel):
+    name: str
+    type: str # "income" or "expense"
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryOut(CategoryBase):
+    id: int
+
+    class Config:
+        from_attributes = True
