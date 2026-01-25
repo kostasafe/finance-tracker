@@ -1,51 +1,130 @@
 # 🚧 Project Status: In Progress 🚧
 
----
+# Finance Tracker – Backend API
 
-# Finance-Tracker Application
-
-This repository contains the backend for an authentication system built with **FastAPI**.  
-The project is currently under development and not yet feature-complete. It serves as the foundation for user registration, login, and future secure API operations.
+This repository contains the backend for a **Finance Tracker application** built with **FastAPI**.  
+The project is under active development and currently focuses on a **secure authentication system** using JWT, with a solid foundation for future finance-related features.
 
 ---
 
-### ✅ Completed So Far
-- Project structure created  
-- Virtual environment + Git repo initialized  
-- FastAPI application running with Uvicorn  
-- SQLite development database added  
-- Database models for `User`  
-- Password hashing using Passlib (bcrypt)  
-- `/auth/register` endpoint implemented  
-- Duplicate username/email validation working  
-- `/auth/login` endpoint implemented (testing in progress)  
-- Interactive Swagger API documentation available at `/docs`
+## 🧱 Tech Stack
+- FastAPI
+- SQLAlchemy (ORM)
+- SQLite (development)
+- Passlib (bcrypt) for password hashing
+- JWT (JSON Web Tokens)
+- Uvicorn ASGI server
 
 ---
 
-## 🔜 Upcoming Features
-The following features will be added as the project continues:
+## ✅ Completed Features
 
-### Authentication Improvements
-- JWT access tokens  
-- Refresh tokens  
-- Token expiration logic  
-- Route protection using authentication dependencies  
+### Project & Infrastructure
+- Clean project structure (`app/` package-based layout)
+- Virtual environment setup
+- Git repository initialized
+- Environment variable support via `.env`
+- SQLite development database (`dev.db`)
+- SQLAlchemy engine, session, and Base configuration
+- Automatic table creation on application startup
 
-### User System Expansions
-- `/me` profile endpoint  
-- Role-based permissions (optional)  
-- Email verification (optional)  
-- Password reset (optional)
+---
 
-### Infrastructure & Project Setup
-- Environment variables using `.env`  
-- Database migration system (Alembic)  
-- Docker containerization  
-- Custom error handling  
+### Authentication System
+- User model implemented
+- Secure password hashing with bcrypt
+- JWT access token creation
+- Token expiration handling
+- OAuth2 Password flow integration
+- Dependency-based authentication system
+
+---
+
+### API Endpoints (Working & Tested)
+
+#### 🔐 Authentication Routes
+- `POST /auth/register`  
+  Register a new user with duplicate username/email validation
+
+- `POST /auth/login`  
+  OAuth2-compatible login (`application/x-www-form-urlencoded`)  
+  Returns a JWT access token
+
+- `GET /auth/me`  
+  Protected route  
+  Requires `Authorization: Bearer <token>`  
+  Returns the currently authenticated user
+
+---
+
+### Database Models
+- **User**
+- **Category**
+  - Linked to user
+  - Supports `income` and `expense` types
+- **Transaction**
+  - Linked to user and category
+  - Stores amount, description, and date
+
+All relationships and cascade rules are fully defined.
+
+---
+
+### API Documentation
+- Interactive Swagger UI available at: http://127.0.0.1:8000/docs
+- OAuth2 “Authorize” button fully functional
+- JWT tokens correctly applied to protected routes
+
+---
+
+## 📊 Current Progress
+Core authentication and data modeling are finished.  
+The project now has a stable, secure foundation for finance features.
+
+---
+
+## 🔜 Planned Features
+
+### Finance Features
+- Category CRUD operations
+- Transaction CRUD operations
+- User-specific data isolation
+- Monthly summaries
+- Income vs expense analytics
+
+---
+
+### Authentication Enhancements (Optional)
+- Refresh tokens
+- Logout / token invalidation
+- Role-based permissions
+- Password reset flow
+- Email verification
+
+---
+
+### Infrastructure & Production Prep
+- Alembic database migrations
+- Docker support
+- Centralized error handling
 - Logging system
+- Rate limiting
+- Security hardening
+- Deployment configuration
 
-### Production Prep
-- Security hardening  
-- Rate limiting  
-- Deployme
+---
+
+## 🚀 Getting Started (Development)
+
+```
+# activate virtual environment
+source venv/bin/activate  # Linux / macOS
+venv\Scripts\activate     # Windows
+
+# install dependencies
+pip install -r requirements.txt
+
+# run development server
+uvicorn app.main:app --reload
+```
+
