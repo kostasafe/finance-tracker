@@ -29,6 +29,7 @@ def create_category(
     db.add(category)
     db.commit()
     db.refresh(category)
+    return category
 
 
 @router.get("/", response_model=list[CategoryOut])
