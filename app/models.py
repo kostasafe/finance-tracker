@@ -30,13 +30,14 @@ class Category(Base):
 class Transaction(Base):
     __tablename__ = "transactions"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
-    amount = Column(Numeric(12, 2), nullable=False)
-    description = Column(String(200))
-    date = Column(Date, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id = Column(Integer, primary_key=True, index=True) #Primary Key
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False) # Owner (user)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True) # Optional category (can be NULL)
+    amount = Column(Numeric(12, 2), nullable=False) #Money amount (supports decimals safely)
+    description = Column(String(200)) #Optional description
+    date = Column(Date, nullable=False) #Transaction date (not creation date)
+    created_at = Column(DateTime, default=datetime.utcnow) #When the record was created
 
+    #Relationships
     owner = relationship("User", back_populates="transactions")
     category = relationship("Category", back_populates="transactions")

@@ -18,6 +18,9 @@ app.include_router(auth_router.router)
 from app.routes import categories as categories_router
 app.include_router(categories_router.router)
 
+from app.routes import transactions as transactions_router
+app.include_router(transactions_router.router)
+
 @app.get("/")
 def root():
     return {"message": "Hello Finance Tracker GG!"}
