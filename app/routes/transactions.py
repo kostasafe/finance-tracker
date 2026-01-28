@@ -69,3 +69,24 @@ def list_transactions(
         .order_by(Transaction.date.desc())
         .all()
     )
+
+@router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    transaction = (
+        db.query(Transaction)
+        .filter(  #ownership-safe query
+            Transaction.id == transaction_id,
+            Transaction.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not transaction: #error control
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    db.delete(transaction)
+    db.commit()
