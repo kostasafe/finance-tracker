@@ -33,7 +33,8 @@ def create_transaction(
         category = (
             db.query(Category)
             .filter(
-                Category.id == transaction_in.category_id
+                Category.id == transaction_in.category_id,
+                Category.user_id == current_user.id
             )
             .first()
         )
