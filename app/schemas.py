@@ -57,6 +57,16 @@ class TransactionBase(BaseModel):
 class TransactionCreate(TransactionBase):
     pass
 
+# Update transaction
+# -------------------------
+class TransactionUpdate(BaseModel):
+    amount: Optional[condecimal(max_digits=12, decimal_places=2)] = None
+    date: Optional[date] = None
+    description: Optional[str] = None
+    category_id: Optional[int] = None
+
+
+
 # Transaction output
 # -------------------------
 class TransactionOut(TransactionBase):

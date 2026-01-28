@@ -70,6 +70,8 @@ def list_transactions(
         .all()
     )
 
+# Delete a transaction
+# -------------------------
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_transaction(
     transaction_id: int,
@@ -90,3 +92,54 @@ def delete_transaction(
     
     db.delete(transaction)
     db.commit()
+
+# Update transaction
+# -------------------------
+@router.put("/{transaction_id}", response_model=TransactionOut)
+def update_transaction(
+    transaction_id: int,
+    transaction_in: TransactionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    transaction = (
+        db.query(Transaction)
+        .filter(        #One query = existence + authorization
+            Transaction.id == transaction_id,
+            Transaction.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    # If category is provided, validate ownership
+    if transaction_in.category_id is not None:
+        category = (
+            db.query(Category)
+            .filter(
+                Category.id == transaction_in.category_id,
+                Category.user_id == current_user.id
+            )
+            .first()
+        )
+        if not category:
+            raise HTTPException(status_code=400, detail="Invalid category")
+        
+        transaction.category_id = transaction_in.category_id
+
+    #Update fields only if provided
+    if transaction_in.amount is not None:
+        transaction.amount = transaction_in.amount
+
+    if transaction_in.date is not None:
+        transaction.date = transaction_id.date
+
+    if transaction_in.description is not None:
+        transaction.description = transaction_in.description
+
+    db.commit()
+    db.refresh(transaction)
+
+    return transaction
