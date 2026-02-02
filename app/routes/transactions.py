@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app.models import Transaction, Category, User
-from app.schemas import TransactionCreate, TransactionOut
+from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut
 from app.dependencies.auth import get_current_user
+from typing import Optional
+from datetime import date
 
 router = APIRouter(
     prefix="/transaction",
@@ -60,15 +62,34 @@ def create_transaction(
 
 @router.get("/", response_model=list[TransactionOut])
 def list_transactions(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    category_id: Optional[int] = None,
+    type: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return (
-        db.query(Transaction)
-        .filter(Transaction.user_id == current_user.id)
-        .order_by(Transaction.date.desc())
-        .all()
+    #Base query: only current user's transactions
+    query = db.query(Transaction).filter(
+        Transaction.user_id == current_user.id
     )
+
+    #Filter by date range
+    if start_date:
+        query = query.filter(Transaction.date >= start_date)
+
+    if end_date:
+        query = query.filter(Transaction.date <= end_date)
+
+    #Filter by category
+    if category_id:
+        query = query.filter(Transaction.category_id == category_id)
+
+    #Filter by category type
+    if type:
+        query = query.join(Category).filter(Category.type == type)
+
+    return query.order_by(Transaction.date.desc()).all() 
 
 # Delete a transaction
 # -------------------------
@@ -134,7 +155,7 @@ def update_transaction(
         transaction.amount = transaction_in.amount
 
     if transaction_in.date is not None:
-        transaction.date = transaction_id.date
+        transaction.date = transaction_in.date
 
     if transaction_in.description is not None:
         transaction.description = transaction_in.description
