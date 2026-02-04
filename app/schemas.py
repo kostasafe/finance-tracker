@@ -65,7 +65,12 @@ class TransactionUpdate(BaseModel):
     description: Optional[str] = None
     category_id: Optional[int] = None
 
-
+# Transaction Summary
+# -------------------------
+class TransactionSummary(BaseModel):
+    total_income: float
+    total_expense: float
+    balance: float
 
 # Transaction output
 # -------------------------

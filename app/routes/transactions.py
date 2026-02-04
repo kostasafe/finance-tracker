@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.db import SessionLocal
 from app.models import Transaction, Category, User
 from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut
@@ -164,3 +165,41 @@ def update_transaction(
     db.refresh(transaction)
 
     return transaction
+
+@router.get("/summary", response_model=TransactionSummary)
+def transaction_summary(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    base_query = (
+        db.query(Transaction)
+        .join(Category)
+        .filter(Transaction.user_id == current_user.id)
+    )
+
+    if start_date:
+        base_query = base_query.filter(Transaction.date >= start_date)
+
+    if end_date:
+        base_query = base_query.filter(Transaction.date <= end_date)
+
+    total_income = (
+        base_query.filter(Category.type == "income")
+        .with_entities(func.coalesce(func.sum(Transaction.amount), 0))
+        .scalar()
+    )
+
+    total_expense = (
+        base_query
+        .filter(Category.type == "expense")
+        .with_entities(func.coalesce(func.sum(Transaction.amount), 0)) #func.sum() --> SQL SUM(), coalesce() --> avoids NULL
+        .scalar()
+    )
+
+    return {
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "balance": total_income - total_expense
+    }
