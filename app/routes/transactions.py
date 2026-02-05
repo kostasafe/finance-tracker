@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.db import SessionLocal
 from app.models import Transaction, Category, User
-from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut
+from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut, TransactionSummary
 from app.dependencies.auth import get_current_user
 from typing import Optional
 from datetime import date
@@ -67,6 +67,10 @@ def list_transactions(
     end_date: Optional[date] = None,
     category_id: Optional[int] = None,
     type: Optional[str] = None,
+
+    page: int = 1,
+    page_size: int = 20,
+
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -90,7 +94,9 @@ def list_transactions(
     if type:
         query = query.join(Category).filter(Category.type == type)
 
-    return query.order_by(Transaction.date.desc()).all() 
+    offset = (page - 1) * page_size
+
+    return (query.order_by(Transaction.date.desc()).offset(offset).limit(page_size).all()) 
 
 # Delete a transaction
 # -------------------------
