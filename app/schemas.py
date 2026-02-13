@@ -73,9 +73,24 @@ class TransactionSummary(BaseModel):
     balance: float
 
 # Transaction output
-# -------------------------
+# ---------------------------
 class TransactionOut(TransactionBase):
     id:int
 
     class Config:
         from_attributes = True
+
+
+# Analytics / Summary Schemas
+# ----------------------------
+
+class MonthlySummaryOut(BaseModel):
+    year: int
+    month: int
+    total_income: float
+    total_expense: float
+    balance: float
+
+class CategoryBreakdownOut(BaseModel):
+    category: str
+    total: float
