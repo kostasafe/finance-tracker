@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, extract, case
 from app.db import SessionLocal
 from app.models import Transaction, Category, User
-from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut, TransactionSummary
+from app.schemas import TransactionCreate, TransactionUpdate, TransactionOut, TransactionSummary, MonthlySummaryOut
 from app.dependencies.auth import get_current_user
 from typing import Optional
 from datetime import date
@@ -172,6 +172,8 @@ def update_transaction(
 
     return transaction
 
+# Summary
+# -------------------------
 @router.get("/summary", response_model=TransactionSummary)
 def transaction_summary(
     start_date: Optional[date] = None,
@@ -209,3 +211,51 @@ def transaction_summary(
         "total_expense": total_expense,
         "balance": total_income - total_expense
     }
+
+# Monthly Summary
+# -------------------------
+@router.get("/summary/monthly", response_model=list[MonthlySummaryOut])
+def monthly_transaction_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    results = (
+        db.query(
+            extract("year", Transaction.date).label("year"),
+            extract("month", Transaction.date).label("month"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (Category.type == "income", Transaction.amount),
+                        else_=0
+                    )
+                ),
+                0
+            ).label("total_income"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (Category.type == "expense", Transaction.amount),
+                        else_=0
+                    )
+                ),
+                0
+            ).label("total_expense"),
+        )
+        .join(Category)
+        .filter(Transaction.user_id == current_user.id)
+        .group_by("year", "month")
+        .order_by("year", "month")
+        .all()
+    )
+
+    return [
+        {
+            "year": int(row.year),
+            "month": int(row.month),
+            "total_income": float(row.total_income),
+            "total_expense": float(row.total_expense),
+            "balance": float(row.total_income - row.total_expense),
+        }
+        for row in results
+    ]
