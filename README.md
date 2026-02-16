@@ -1,63 +1,54 @@
- # 🚧 Project Status: In Progress 🚧
- 
-# Finance Tracker – Backend API
+# 💰 Finance Tracker – Backend API
 
-This repository contains the backend for a **Finance Tracker application** built with **FastAPI**.  
-The project is under active development and currently implements a **secure, user-isolated finance system** with authentication, categories, and transactions.
+A **secure, user-scoped finance tracking backend API** built with **FastAPI**.  
+This project demonstrates real-world backend development practices including authentication, authorization, relational data modeling, filtering, pagination, and financial aggregation.
+
+> **Status:** Backend feature-complete and ready for extension
 
 ---
 
 ## 🧱 Tech Stack
+
 - FastAPI
 - SQLAlchemy (ORM)
-- SQLite (development)
+- SQLite (development database)
 - Pydantic v2
-- Passlib (bcrypt) for password hashing
 - JWT (JSON Web Tokens)
+- Passlib (bcrypt) for password hashing
 - Uvicorn ASGI server
 
 ---
 
-
 ## 🏗️ Project Structure
-- `app/`
-  - `main.py` – FastAPI app entry point
-  - `db.py` – Database engine, session, and Base
-  - `models.py` – SQLAlchemy models
-  - `schemas.py` – Pydantic schemas
-  - `routes/` – API route modules
-  - `dependencies/` – Authentication dependencies
+
+```
+app/
+├── main.py            # FastAPI application entry point
+├── db.py              # Database engine, session, and Base
+├── models.py          # SQLAlchemy models
+├── schemas.py         # Pydantic schemas
+├── routes/            # API route modules
+└── dependencies/      # Authentication & shared dependencies
+```
 
 ---
 
-## ✅ Completed Features
+## ✅ Implemented Features
 
-### Project & Infrastructure
-- Clean package-based project structure
-- Virtual environment setup
-- Git repository initialized
-- Environment variables support via `.env`
-- SQLite development database (`dev.db`)
-- SQLAlchemy engine, session, and Base configuration
-- Automatic table creation on application startup
-
----
-
-### 🔐 Authentication System
-- User model implemented
+### 🔐 Authentication & Authorization
+- User registration and login
 - Secure password hashing with bcrypt
-- JWT access token creation
-- Token expiration handling
-- OAuth2 Password flow integration
-- Dependency-based authentication system
-- User-specific data isolation enforced at query level
+- JWT access token generation and expiration
+- OAuth2 password flow
+- Dependency-based authentication
+- Strict user data isolation enforced at query level
 
 ---
 
 ### 🗂️ Categories
-- Category model linked to user
+- User-owned categories
 - Supports `income` and `expense` types
-- Full CRUD operations:
+- CRUD operations:
   - Create category
   - List user categories
   - Delete category
@@ -66,27 +57,39 @@ The project is under active development and currently implements a **secure, use
 ---
 
 ### 💸 Transactions
-- Transaction model linked to user and category
+- User-owned transactions with optional category
 - Stores:
-  - Amount (Decimal)
+  - Amount
   - Date
   - Description
-  - Optional category
-- Full CRUD operations:
+  - Category (optional)
+- CRUD operations:
   - Create transaction
-  - List user transactions
-  - Update transaction
+  - List transactions
+  - Update transaction (partial updates supported)
   - Delete transaction
-- Secure ownership checks on all operations
+- Ownership validation on all operations
 - Category ownership validation when assigning categories
 - Filtering support:
-  - By date range
-  - By category
-  - By category type (income / expense)
+  - Date range
+  - Category
+  - Category type (`income` / `expense`)
+- Pagination support (`page`, `page_size`)
 
 ---
 
-## 🌐 API Endpoints (Implemented)
+### 📊 Financial Summary
+- Aggregated transaction summary endpoint
+- Calculates:
+  - Total income
+  - Total expenses
+  - Balance
+- Implemented using SQL aggregation (`SUM`, `JOIN`, `COALESCE`)
+- Fully user-scoped and filterable by date range
+
+---
+
+## 🌐 API Endpoints
 
 ### 🔐 Authentication
 - `POST /auth/register` – Register a new user
@@ -102,46 +105,23 @@ The project is under active development and currently implements a **secure, use
 
 ---
 
-
 ### 💸 Transactions
 - `POST /transaction/` – Create transaction
-- `GET /transaction/` – List transactions (with filters)
+- `GET /transaction/` – List transactions (filters + pagination)
 - `PUT /transaction/{id}` – Update transaction
 - `DELETE /transaction/{id}` – Delete transaction
+- `GET /transaction/summary` – Financial summary
 
-All protected routes require: Authorization: Bearer <access_token>
+> 🔒 All protected routes require:  
+> `Authorization: Bearer <access_token>`
 
 ---
 
 ## 📘 API Documentation
-- Interactive Swagger UI available at: http://127.0.0.1:8000/docs
-- OAuth2 “Authorize” button fully functional
-- JWT tokens correctly applied to protected routes
 
----
-
-## 📊 Current Progress
-- Authentication system complete
-- Category system complete
-- Transaction system complete (CRUD + filtering)
-- Secure multi-user data isolation fully enforced
-
-This backend is now a **solid, production-ready foundation** for finance features.
-
----
-
-## 🔜 Planned Features
-
-### Finance Features
-- Monthly summaries
-- Income vs expense analytics
-- Account balances
-- Pagination & advanced reporting
-
----
-
-
-- Deployment configuration
+- Swagger UI available at: `http://127.0.0.1:8000/docs`
+- OAuth2 “Authorize” button enabled
+- JWT tokens automatically applied to protected routes
 
 ---
 
@@ -149,11 +129,42 @@ This backend is now a **solid, production-ready foundation** for finance feature
 
 ```bash
 # activate virtual environment
-source venv/bin/activate  # Linux / macOS
-venv\Scripts\activate     # Windows
+source venv/bin/activate    # Linux / macOS
+venv\Scripts\activate       # Windows
 
 # install dependencies
 pip install -r requirements.txt
 
 # run development server
 uvicorn app.main:app --reload
+```
+
+---
+
+## 📌 Project Highlights
+
+- Clean, modular architecture
+- Strong separation of concerns
+- Ownership-safe database queries
+- Defensive validation and error handling
+- Designed for easy extension:
+  - Frontend integration
+  - PostgreSQL migration
+  - Deployment with Docker or cloud services
+
+---
+
+## 🔜 Possible Extensions
+
+- Monthly and yearly analytics
+- CSV export
+- Account balances
+- PostgreSQL support
+- Deployment configuration
+
+---
+
+## 🧑‍💻 Purpose
+
+This project was built to demonstrate **production-ready backend fundamentals**:
+authentication, authorization, data isolation, relational modeling, pagination, filtering, and aggregation using FastAPI and SQLAlchemy.
