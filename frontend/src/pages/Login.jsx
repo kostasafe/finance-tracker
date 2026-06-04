@@ -1,8 +1,27 @@
 import { useState } from "react";
+import api from "../api";
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+
+    const handleLogin = async () => {
+        try {
+            const formData = new URLSearchParams();
+
+            formData.append("username", username);
+            formData.append("password", password);
+
+            const response = await api.post(         //Wait for FastAPI to answer before continuing.
+                "/auth/login",
+                formData
+            );
+
+            console.log(response.data);
+       } catch (error) {
+        console.error(error);
+       }
+    };
 
     return (
         <div>
@@ -28,7 +47,9 @@ function Login() {
             <br />
             <br />
 
-            <button>Login</button>
+            <button onClick={handleLogin}>
+                Login
+            </button>
         </div>
     );
 }
