@@ -1,170 +1,105 @@
-# 💰 Finance Tracker – Backend API
+# Finance Tracker
 
-A **secure, user-scoped finance tracking backend API** built with **FastAPI**.  
-This project demonstrates real-world backend development practices including authentication, authorization, relational data modeling, filtering, pagination, and financial aggregation.
+A secure, user-scoped finance tracking app with a FastAPI backend and a Vite + React frontend.
 
-> **Status:** Backend feature-complete and ready for extension
+## 🚀 Project Overview
 
----
+This repository includes:
+- `app/` — FastAPI backend API with JWT authentication and SQLite persistence
+- `frontend/` — Vite-powered React user interface
+- `create_tables.py` — database initialization helper
+- `requirements.txt` — Python dependencies
+- `frontend/package.json` — frontend dependencies
 
-## 🧱 Tech Stack
+## 🧱 Features
 
-- FastAPI
-- SQLAlchemy (ORM)
-- SQLite (development database)
-- Pydantic v2
-- JWT (JSON Web Tokens)
-- Passlib (bcrypt) for password hashing
-- Uvicorn ASGI server
+- User registration and login
+- JWT-based authentication
+- User-specific categories (`income` / `expense`)
+- CRUD operations for categories
+- User-owned transactions with optional categories
+- Filtering and pagination for transactions
+- Aggregated financial summary (income, expenses, balance)
+- CORS enabled for local frontend integration
 
----
+## 💻 Tech Stack
 
-## 🏗️ Project Structure
+- Backend: FastAPI, SQLAlchemy, Pydantic v2
+- Auth: OAuth2 password flow, JWT, bcrypt
+- Database: SQLite
+- Frontend: React, Vite, Axios
+
+## 📁 Project Structure
 
 ```
 app/
-├── main.py            # FastAPI application entry point
-├── db.py              # Database engine, session, and Base
-├── models.py          # SQLAlchemy models
-├── schemas.py         # Pydantic schemas
-├── routes/            # API route modules
-└── dependencies/      # Authentication & shared dependencies
+├── main.py
+├── db.py
+├── models.py
+├── schemas.py
+├── routes/
+└── dependencies/
+frontend/
+├── package.json
+└── src/
 ```
 
----
+## 🏁 Getting Started
 
-## ✅ Implemented Features
-
-### 🔐 Authentication & Authorization
-- User registration and login
-- Secure password hashing with bcrypt
-- JWT access token generation and expiration
-- OAuth2 password flow
-- Dependency-based authentication
-- Strict user data isolation enforced at query level
-
----
-
-### 🗂️ Categories
-- User-owned categories
-- Supports `income` and `expense` types
-- CRUD operations:
-  - Create category
-  - List user categories
-  - Delete category
-- Ownership validation (users can only access their own categories)
-
----
-
-### 💸 Transactions
-- User-owned transactions with optional category
-- Stores:
-  - Amount
-  - Date
-  - Description
-  - Category (optional)
-- CRUD operations:
-  - Create transaction
-  - List transactions
-  - Update transaction (partial updates supported)
-  - Delete transaction
-- Ownership validation on all operations
-- Category ownership validation when assigning categories
-- Filtering support:
-  - Date range
-  - Category
-  - Category type (`income` / `expense`)
-- Pagination support (`page`, `page_size`)
-
----
-
-### 📊 Financial Summary
-- Aggregated transaction summary endpoint
-- Calculates:
-  - Total income
-  - Total expenses
-  - Balance
-- Implemented using SQL aggregation (`SUM`, `JOIN`, `COALESCE`)
-- Fully user-scoped and filterable by date range
-
----
-
-## 🌐 API Endpoints
-
-### 🔐 Authentication
-- `POST /auth/register` – Register a new user
-- `POST /auth/login` – Login and receive JWT access token
-- `GET /auth/me` – Get current authenticated user
-
----
-
-### 🗂️ Categories
-- `POST /categories/` – Create category
-- `GET /categories/` – List user categories
-- `DELETE /categories/{id}` – Delete category
-
----
-
-### 💸 Transactions
-- `POST /transaction/` – Create transaction
-- `GET /transaction/` – List transactions (filters + pagination)
-- `PUT /transaction/{id}` – Update transaction
-- `DELETE /transaction/{id}` – Delete transaction
-- `GET /transaction/summary` – Financial summary
-
-> 🔒 All protected routes require:  
-> `Authorization: Bearer <access_token>`
-
----
-
-## 📘 API Documentation
-
-- Swagger UI available at: `http://127.0.0.1:8000/docs`
-- OAuth2 “Authorize” button enabled
-- JWT tokens automatically applied to protected routes
-
----
-
-## 🚀 Getting Started (Development)
+### Backend
 
 ```bash
-# activate virtual environment
-source venv/bin/activate    # Linux / macOS
-venv\Scripts\activate       # Windows
-
-# install dependencies
+cd finance-tracker
+python -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
-
-# run development server
 uvicorn app.main:app --reload
 ```
 
----
+### Frontend
 
-## 📌 Project Highlights
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- Clean, modular architecture
-- Strong separation of concerns
-- Ownership-safe database queries
-- Defensive validation and error handling
-- Designed for easy extension:
-  - Frontend integration
-  - PostgreSQL migration
-  - Deployment with Docker or cloud services
+## 🌐 Local Development URLs
 
----
+- Backend API: `http://127.0.0.1:8000`
+- Swagger docs: `http://127.0.0.1:8000/docs`
+- Frontend UI: `http://localhost:5173`
 
-## 🔜 Possible Extensions
+## 🔐 API Endpoints
 
-- Monthly and yearly analytics
-- CSV export
-- Account balances
-- PostgreSQL support
-- Deployment configuration
+### Authentication
+- `POST /auth/register` — Register new user
+- `POST /auth/login` — Authenticate and get JWT
+- `GET /auth/me` — Get current authenticated user
 
----
+### Categories
+- `POST /categories/` — Create category
+- `GET /categories/` — List user categories
+- `DELETE /categories/{id}` — Delete category
 
-## 🧑‍💻 Purpose
+### Transactions
+- `POST /transaction/` — Create transaction
+- `GET /transaction/` — List transactions
+- `PUT /transaction/{id}` — Update transaction
+- `DELETE /transaction/{id}` — Delete transaction
+- `GET /transaction/summary` — Financial summary
 
-This project was built to demonstrate **production-ready backend fundamentals**:
-authentication, authorization, data isolation, relational modeling, pagination, filtering, and aggregation using FastAPI and SQLAlchemy.
+> Protected endpoints require `Authorization: Bearer <access_token>`
+
+## 🔧 Notes
+
+- CORS is configured for `http://localhost:5173`
+- SQLite is used for development and can be replaced with PostgreSQL for production
+- The backend creates tables automatically at startup via `Base.metadata.create_all`
+
+## 📌 Recommended Improvements
+
+- Add user registration and login UI in frontend
+- Add transaction and category management pages
+- Add monthly / yearly analytics dashboards
+- Add deployment configuration for Docker or cloud hosting
