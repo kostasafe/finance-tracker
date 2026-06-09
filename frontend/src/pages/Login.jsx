@@ -17,7 +17,9 @@ function Login() {
                 formData
             );
 
-            console.log(response.data);
+            localStorage.setItem("access_token", response.data.access_token);
+
+            console.log("Token Saved!");
        } catch (error) {
         console.error(error);
        }
