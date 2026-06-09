@@ -1,4 +1,4 @@
-# Finance Tracker
+# Finance Tracker App
 
 A secure, user-scoped finance tracking app with a FastAPI backend and a Vite + React frontend.
 
