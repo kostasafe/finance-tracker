@@ -4,6 +4,7 @@ import api from "../api";
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [user, setUser] = useState(null);
 
     const handleLogin = async () => {
         try {
@@ -12,17 +13,35 @@ function Login() {
             formData.append("username", username);
             formData.append("password", password);
 
-            const response = await api.post(         //Wait for FastAPI to answer before continuing.
+            const response = await api.post(
                 "/auth/login",
                 formData
             );
 
-            localStorage.setItem("access_token", response.data.access_token);
+            const accessToken = response.data?.access_token;
+            if (!accessToken) {
+                console.error("Login response did not include access_token", response.data);
+                return;
+            }
 
-            console.log("Token Saved!");
-       } catch (error) {
-        console.error(error);
-       }
+            // Save token to localStorage and set default Authorization header for future requests.
+            localStorage.setItem("access_token", accessToken);
+            api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+            console.log("Token saved to localStorage and Authorization header set.");
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchUserData = async () => {
+        try {
+            const response = await api.get("/auth/me");
+            setUser(response.data);
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -52,6 +71,19 @@ function Login() {
             <button onClick={handleLogin}>
                 Login
             </button>
+            <br />
+
+            <button onClick={fetchUserData}>
+                Get Current User
+            </button>
+
+            {user && (
+                <div>
+                    <h3>User Info:</h3>
+                    <p>ID: {user.id}</p>
+                    <p>Username: {user.username}</p>
+                </div>
+            )}
         </div>
     );
 }
