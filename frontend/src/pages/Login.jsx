@@ -34,6 +34,14 @@ function Login() {
         }
     };
 
+    const handleLogout = () => {
+        // Remove the saved token and clear the Authorization header so future requests are unauthenticated.
+        localStorage.removeItem("access_token");
+        delete api.defaults.headers.common["Authorization"];
+        setUser(null);
+        console.log("Logged out and cleared stored token.");
+    };
+
     const fetchUserData = async () => {
         try {
             const response = await api.get("/auth/me");
@@ -70,6 +78,9 @@ function Login() {
 
             <button onClick={handleLogin}>
                 Login
+            </button>
+            <button onClick={handleLogout} style={{ marginLeft: "10px" }}>
+                Logout
             </button>
             <br />
 
