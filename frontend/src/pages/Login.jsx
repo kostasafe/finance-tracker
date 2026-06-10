@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../api";
+import "./Login.css";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -53,48 +54,59 @@ function Login() {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-
-            <input 
-            type="text" 
-            placeholder="Username" 
-            value={username}
-            onChange={(e) => setUsername(e.target.value)} 
-            />
-
-            <br />
-            <br />
-
-            <input 
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <br />
-            <br />
-
-            <button onClick={handleLogin}>
-                Login
-            </button>
-            <button onClick={handleLogout} style={{ marginLeft: "10px" }}>
-                Logout
-            </button>
-            <br />
-
-            <button onClick={fetchUserData}>
-                Get Current User
-            </button>
-
-            {user && (
-                <div>
-                    <h3>User Info:</h3>
-                    <p>ID: {user.id}</p>
-                    <p>Username: {user.username}</p>
+        <div className="login-screen">
+            <div className="login-card">
+                <div className="login-brand">
+                    <span className="login-badge">Finance Tracker</span>
+                    <h2>Welcome back</h2>
+                    <p>Sign in to manage your spending, track transactions, and stay in control of your finances.</p>
                 </div>
-            )}
+
+                <div className="login-form">
+                    <label className="form-group">
+                        <span>Username</span>
+                        <input
+                            className="login-input"
+                            type="text"
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </label>
+
+                    <label className="form-group">
+                        <span>Password</span>
+                        <input
+                            className="login-input"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </label>
+
+                    <div className="login-actions">
+                        <button type="button" className="button primary" onClick={handleLogin}>
+                            Sign in
+                        </button>
+                        <button type="button" className="button secondary" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" className="link-button" onClick={fetchUserData}>
+                    Get current user
+                </button>
+
+                {user && (
+                    <div className="user-card">
+                        <h3>User Info</h3>
+                        <p>ID: {user.id}</p>
+                        <p>Username: {user.username}</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
