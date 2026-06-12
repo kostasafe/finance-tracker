@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import "./Login.css";
 
 function Login() {
+    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState(null);
@@ -30,6 +32,9 @@ function Login() {
             api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
             console.log("Token saved to localStorage and Authorization header set.");
+
+            // after login success:
+            navigate("/dashboard");
         } catch (error) {
             console.error(error);
         }
