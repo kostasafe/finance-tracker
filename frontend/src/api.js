@@ -4,11 +4,7 @@ const api = axios.create({
   baseURL: "http://127.0.0.1:8000",
 });
 
-// Restore saved JWT from localStorage on app start.
-// This ensures axios sends Authorization after a page reload.
-const token = localStorage.getItem("access_token");
-if (token) {
-  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-}
+// Do not auto-restore a token from previous sessions.
+// Tokens are set explicitly after a successful login in the UI.
 
 export default api;
