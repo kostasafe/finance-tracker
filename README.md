@@ -1,82 +1,91 @@
 # Finance Tracker App
 
-A secure, user-scoped finance tracking app with a FastAPI backend and a Vite + React frontend.
+A secure personal finance tracker with a FastAPI backend and a Vite + React frontend.
 
-## 🚀 Project Overview
+## Overview
 
-This repository includes:
-- `app/` — FastAPI backend API with JWT authentication and SQLite persistence
-- `frontend/` — Vite-powered React user interface
-- `create_tables.py` — database initialization helper
-- `requirements.txt` — Python dependencies
-- `frontend/package.json` — frontend dependencies
+- Backend: FastAPI REST API with JWT authentication and SQLite persistence
+- Frontend: React + Vite user interface
+- Database: SQLite by default, configurable via `.env`
 
-## 🧱 Features
+## Features
 
 - User registration and login
-- JWT-based authentication
-- User-specific categories (`income` / `expense`)
-- CRUD operations for categories
+- JWT-secured routes for authenticated users
+- CRUD categories for income and expenses
 - User-owned transactions with optional categories
-- Filtering and pagination for transactions
-- Aggregated financial summary (income, expenses, balance)
-- CORS enabled for local frontend integration
+- Transaction listing and summary endpoints
+- Local CORS support for frontend development
+- Automatic DB table creation at startup
 
-## 🔐 Frontend authentication details (JWT)
+## Requirements
 
-- The frontend uses JWT access tokens returned by the backend `POST /auth/login` endpoint.
-- Tokens are saved to `localStorage` under the key `access_token` for convenience during development.
-- To make API requests authenticated after a page reload, the frontend restores the saved token on startup and sets the axios default `Authorization` header.
+- Python 3.10+ or 3.11+
+- Node.js 18+
+- npm 10+ or yarn
 
-Files changed in this flow:
-- `frontend/src/api.js` — creates a shared axios instance and restores `access_token` from `localStorage` on module load, setting `api.defaults.headers.common['Authorization']` when present.
-- `frontend/src/pages/Login.jsx` — saves `access_token` returned by `/auth/login`, sets the default axios header immediately after login, and includes a `Logout` button that clears `localStorage` and the axios header.
+## Backend setup
 
-Minimal example (already implemented in `frontend/src/api.js`):
-
-```js
-import axios from "axios";
-
-const api = axios.create({ baseURL: "http://127.0.0.1:8000" });
-
-// Restore saved JWT from localStorage on app start so axios keeps sending Authorization after reloads
-const token = localStorage.getItem("access_token");
-if (token) api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-export default api;
+```bash
+cd finance-tracker
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
-Login handling (high-level):
+Optionally initialize the database explicitly:
 
-- After a successful `POST /auth/login`, read `response.data.access_token`, save it to `localStorage`, and set `api.defaults.headers.common['Authorization'] = `Bearer ${token}`` so subsequent `api` calls include the header without manually adding it.
-
-Logout handling:
-
-- Remove the token and clear the header:
-
-```js
-localStorage.removeItem("access_token");
-delete api.defaults.headers.common["Authorization"];
+```bash
+python create_tables.py
 ```
 
-Verification steps in the browser:
+## Frontend setup
 
-- DevTools → Application → Local Storage: confirm `access_token` exists.
-- DevTools → Network → select an authenticated request (e.g. `GET /auth/me`) → Request Headers → confirm `Authorization: Bearer <token>` is present.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Security note:
+## Environment configuration
 
-- Storing tokens in `localStorage` is simple and fine for local development, but it exposes the token to JavaScript and increases risk from XSS attacks. For production, prefer using secure, HttpOnly cookies with proper CSRF protection and refresh-token rotation.
+The backend loads environment variables from a `.env` file when present.
 
+Supported variables:
 
-## 💻 Tech Stack
+- `DATABASE_URL` — database URL (default: `sqlite:///dev.db`)
+- `SECRET_KEY` — JWT signing key (default: `super-secret-dev-key`)
+- `ACCESS_TOKEN_EXPIRE_MINUTES` — token expiration in minutes (default: `60`)
 
-- Backend: FastAPI, SQLAlchemy, Pydantic v2
-- Auth: OAuth2 password flow, JWT, bcrypt
-- Database: SQLite
-- Frontend: React, Vite, Axios
+## Local URLs
 
-## 📁 Project Structure
+- Backend API: `http://127.0.0.1:8000`
+- Swagger docs: `http://127.0.0.1:8000/docs`
+- Frontend UI: `http://localhost:5173`
+
+## API Endpoints
+
+### Authentication
+- `POST /auth/register` — register a new user
+- `POST /auth/login` — authenticate and receive a JWT
+- `GET /auth/me` — get the authenticated user's profile
+
+### Categories
+- `POST /categories/` — create a category
+- `GET /categories/` — list the current user's categories
+- `DELETE /categories/{id}` — delete a category
+
+### Transactions
+- `POST /transaction/` — create a transaction
+- `GET /transaction/` — list transactions
+- `PUT /transaction/{id}` — update a transaction
+- `DELETE /transaction/{id}` — delete a transaction
+- `GET /transaction/summary` — get income/expense summary
+
+> Protected endpoints require `Authorization: Bearer <access_token>`
+
+## Project structure
 
 ```
 app/
@@ -91,62 +100,8 @@ frontend/
 └── src/
 ```
 
-## 🏁 Getting Started
+## Notes
 
-### Backend
-
-```bash
-cd finance-tracker
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## 🌐 Local Development URLs
-
-- Backend API: `http://127.0.0.1:8000`
-- Swagger docs: `http://127.0.0.1:8000/docs`
-- Frontend UI: `http://localhost:5173`
-
-## 🔐 API Endpoints
-
-### Authentication
-- `POST /auth/register` — Register new user
-- `POST /auth/login` — Authenticate and get JWT
-- `GET /auth/me` — Get current authenticated user
-
-### Categories
-- `POST /categories/` — Create category
-- `GET /categories/` — List user categories
-- `DELETE /categories/{id}` — Delete category
-
-### Transactions
-- `POST /transaction/` — Create transaction
-- `GET /transaction/` — List transactions
-- `PUT /transaction/{id}` — Update transaction
-- `DELETE /transaction/{id}` — Delete transaction
-- `GET /transaction/summary` — Financial summary
-
-> Protected endpoints require `Authorization: Bearer <access_token>`
-
-## 🔧 Notes
-
-- CORS is configured for `http://localhost:5173`
-- SQLite is used for development and can be replaced with PostgreSQL for production
-- The backend creates tables automatically at startup via `Base.metadata.create_all`
-
-## 📌 Recommended Improvements
-
-- Add user registration and login UI in frontend
-- Add transaction and category management pages
-- Add monthly / yearly analytics dashboards
-- Add deployment configuration for Docker or cloud hosting
+- The backend automatically creates tables using SQLAlchemy `Base.metadata.create_all`
+- Frontend auth is handled by JWT tokens stored in `localStorage` for development
+- For production, consider secure HttpOnly cookies and refresh token rotation
