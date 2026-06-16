@@ -1,30 +1,30 @@
-# Finance Tracker App
+# Finance Tracker
 
-A secure personal finance tracker with a FastAPI backend and a Vite + React frontend.
+A personal finance tracker with a FastAPI backend and a Vite + React frontend.
 
-## Overview
+## What it does
 
-- Backend: FastAPI REST API with JWT authentication and SQLite persistence
-- Frontend: React + Vite user interface
-- Database: SQLite by default, configurable via `.env`
+- Secure user signup and login with JWT authentication
+- Manage categories for income and expenses
+- Add transactions with optional category assignment
+- Display recent transactions and category summaries
+- Separate backend API and frontend UI for fast local development
 
-## Features
+## Tech stack
 
-- User registration and login
-- JWT-secured routes for authenticated users
-- CRUD categories for income and expenses
-- User-owned transactions with optional categories
-- Transaction listing and summary endpoints
-- Local CORS support for frontend development
-- Automatic DB table creation at startup
+- Backend: FastAPI, SQLAlchemy, SQLite, JWT auth
+- Frontend: React, Vite, Axios
+- Dev tools: Uvicorn for backend, Vite for frontend
 
 ## Requirements
 
-- Python 3.10+ or 3.11+
+- Python 3.10+
 - Node.js 18+
-- npm 10+ or yarn
+- npm 10+ (or yarn)
 
-## Backend setup
+## Quick start
+
+### Backend
 
 ```bash
 cd finance-tracker
@@ -34,13 +34,13 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Optionally initialize the database explicitly:
+If you want to create the database schema manually:
 
 ```bash
 python create_tables.py
 ```
 
-## Frontend setup
+### Frontend
 
 ```bash
 cd frontend
@@ -48,44 +48,49 @@ npm install
 npm run dev
 ```
 
-## Environment configuration
+Open the app in your browser at `http://localhost:5173`.
 
-The backend loads environment variables from a `.env` file when present.
+## Configuration
+
+Create a `.env` file in the project root to override defaults.
 
 Supported variables:
 
-- `DATABASE_URL` — database URL (default: `sqlite:///dev.db`)
+- `DATABASE_URL` — database connection string (default: `sqlite:///dev.db`)
 - `SECRET_KEY` — JWT signing key (default: `super-secret-dev-key`)
 - `ACCESS_TOKEN_EXPIRE_MINUTES` — token expiration in minutes (default: `60`)
+
+## API overview
+
+### Authentication
+
+- `POST /auth/register` — register a new user
+- `POST /auth/login` — login and receive a JWT token
+- `GET /auth/me` — get current user details
+
+### Categories
+
+- `GET /categories/` — list categories for the authenticated user
+- `POST /categories/` — create a new category
+- `DELETE /categories/{id}` — delete a category
+
+### Transactions
+
+- `GET /transaction/` — list transactions
+- `POST /transaction/` — create a transaction
+- `PUT /transaction/{id}` — update a transaction
+- `DELETE /transaction/{id}` — delete a transaction
+- `GET /transaction/summary` — get income/expense summary
+
+> Note: protected endpoints require `Authorization: Bearer <access_token>`.
 
 ## Local URLs
 
 - Backend API: `http://127.0.0.1:8000`
 - Swagger docs: `http://127.0.0.1:8000/docs`
-- Frontend UI: `http://localhost:5173`
+- Frontend: `http://localhost:5173`
 
-## API Endpoints
-
-### Authentication
-- `POST /auth/register` — register a new user
-- `POST /auth/login` — authenticate and receive a JWT
-- `GET /auth/me` — get the authenticated user's profile
-
-### Categories
-- `POST /categories/` — create a category
-- `GET /categories/` — list the current user's categories
-- `DELETE /categories/{id}` — delete a category
-
-### Transactions
-- `POST /transaction/` — create a transaction
-- `GET /transaction/` — list transactions
-- `PUT /transaction/{id}` — update a transaction
-- `DELETE /transaction/{id}` — delete a transaction
-- `GET /transaction/summary` — get income/expense summary
-
-> Protected endpoints require `Authorization: Bearer <access_token>`
-
-## Project structure
+## Project layout
 
 ```
 app/
@@ -102,6 +107,6 @@ frontend/
 
 ## Notes
 
-- The backend automatically creates tables using SQLAlchemy `Base.metadata.create_all`
-- Frontend auth is handled by JWT tokens stored in `localStorage` for development
-- For production, consider secure HttpOnly cookies and refresh token rotation
+- Backend tables are created automatically on startup
+- Frontend stores JWT tokens in `localStorage` for development
+- For production, use secure cookies and refresh token rotation
