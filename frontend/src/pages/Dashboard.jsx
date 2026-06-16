@@ -205,7 +205,7 @@ function Dashboard() {
 										<tr key={t.id} style={{ borderBottom: "1px solid #f4f4f4" }}>
 											<td style={{ padding: "8px 4px", width: 110 }}>{new Date(t.date).toLocaleDateString()}</td>
 											<td style={{ padding: "8px 4px" }}>{t.description || "-"}</td>
-											<td style={{ padding: "8px 4px" }}>{t.category?.name ?? "-"}</td>
+							<td style={{ padding: "8px 4px" }}>{categories.find((c) => c.id === t.category_id)?.name ?? "-"}</td>
 											<td style={{ padding: "8px 4px", textAlign: "right" }}>{Number(t.amount).toFixed(2)}</td>
 										</tr>
 									))}
