@@ -104,6 +104,31 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
+.error-message {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.login-footer {
+  margin-top: 18px;
+  text-align: center;
+  color: #4b5563;
+}
+
+.login-footer a {
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
 .button:hover {
   transform: translateY(-1px);
 }
