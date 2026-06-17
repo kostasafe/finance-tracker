@@ -1,10 +1,21 @@
 import axios from "axios";
+import { getToken } from "./utils/auth";
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000",
 });
 
-// Do not auto-restore a token from previous sessions.
-// Tokens are set explicitly after a successful login in the UI.
+const token = getToken();
+if (token) {
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
+api.setAuthToken = (authToken) => {
+  if (authToken) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+  } else {
+    delete api.defaults.headers.common["Authorization"];
+  }
+};
 
 export default api;
