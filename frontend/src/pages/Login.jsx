@@ -1,119 +1,118 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
+import { getToken, setToken, removeToken } from "../utils/auth";
 import "./Login.css";
 
 function Login() {
-    const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
-        try {
-            const formData = new URLSearchParams();
+  useEffect(() => {
+    if (getToken()) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
 
-            formData.append("username", username);
-            formData.append("password", password);
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setError("");
 
-            const response = await api.post(
-                "/auth/login",
-                formData
-            );
+    if (!username || !password) {
+      setError("Please enter both username and password.");
+      return;
+    }
 
-            const accessToken = response.data?.access_token;
-            if (!accessToken) {
-                console.error("Login response did not include access_token", response.data);
-                return;
-            }
+    setLoading(true);
 
-            // Save token to localStorage and set default Authorization header for future requests.
-            localStorage.setItem("access_token", accessToken);
-            api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    try {
+      const formData = new URLSearchParams();
+      formData.append("username", username);
+      formData.append("password", password);
 
-            console.log("Token saved to localStorage and Authorization header set.");
+      const response = await api.post("/auth/login", formData);
+      const accessToken = response.data?.access_token;
 
-            // after login success:
-            navigate("/dashboard");
-        } catch (error) {
-            console.error(error);
-        }
-    };
+      if (!accessToken) {
+        setError("Login failed. Please try again.");
+        return;
+      }
 
-    const handleLogout = () => {
-        // Remove the saved token and clear the Authorization header so future requests are unauthenticated.
-        localStorage.removeItem("access_token");
-        delete api.defaults.headers.common["Authorization"];
-        setUser(null);
-        console.log("Logged out and cleared stored token.");
-    };
+      setToken(accessToken);
+      api.setAuthToken(accessToken);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.detail || "Unable to login. Please check your credentials."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const fetchUserData = async () => {
-        try {
-            const response = await api.get("/auth/me");
-            setUser(response.data);
-            console.log(response.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+  const handleLogout = () => {
+    removeToken();
+    api.setAuthToken(null);
+    navigate("/");
+  };
 
-    return (
-        <div className="login-screen">
-            <div className="login-card">
-                <div className="login-brand">
-                    <span className="login-badge">Finance Tracker</span>
-                    <h2>Welcome back</h2>
-                    <p>Sign in to manage your spending, track transactions, and stay in control of your finances.</p>
-                </div>
-
-                <div className="login-form">
-                    <label className="form-group">
-                        <span>Username</span>
-                        <input
-                            className="login-input"
-                            type="text"
-                            placeholder="Enter your username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </label>
-
-                    <label className="form-group">
-                        <span>Password</span>
-                        <input
-                            className="login-input"
-                            type="password"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </label>
-
-                    <div className="login-actions">
-                        <button type="button" className="button primary" onClick={handleLogin}>
-                            Sign in
-                        </button>
-                        <button type="button" className="button secondary" onClick={handleLogout}>
-                            Logout
-                        </button>
-                    </div>
-                </div>
-
-                <button type="button" className="link-button" onClick={fetchUserData}>
-                    Get current user
-                </button>
-
-                {user && (
-                    <div className="user-card">
-                        <h3>User Info</h3>
-                        <p>ID: {user.id}</p>
-                        <p>Username: {user.username}</p>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="login-screen">
+      <div className="login-card">
+        <div className="login-brand">
+          <span className="login-badge">Finance Tracker</span>
+          <h2>Welcome back</h2>
+          <p>Sign in to manage your spending, track transactions, and stay in control of your finances.</p>
         </div>
-    );
+
+        <form className="login-form" onSubmit={handleLogin}>
+          {error && <div className="error-message">{error}</div>}
+
+          <label className="form-group">
+            <span>Username</span>
+            <input
+              className="login-input"
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+            />
+          </label>
+
+          <label className="form-group">
+            <span>Password</span>
+            <input
+              className="login-input"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+          </label>
+
+          <div className="login-actions">
+            <button className="button primary" type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+            <button type="button" className="button secondary" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </form>
+
+        <div className="login-footer">
+          <p>
+            New here? <Link to="/register">Create an account</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Login;
