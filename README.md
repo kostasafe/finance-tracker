@@ -10,6 +10,16 @@ A personal finance tracker with a FastAPI backend and a Vite + React frontend.
 - Display recent transactions and category summaries
 - Separate backend API and frontend UI for fast local development
 
+## New features
+
+- Transaction filtering and pagination: `/transaction` supports `start_date`, `end_date`, `category_id`, `type`, `page` and `page_size` query parameters for flexible listing and paging.
+- Transaction management: create, update and delete transactions via the API (`POST`, `PUT`, `DELETE` on `/transaction`).
+- Transaction summaries: aggregate totals via `/transaction/summary` and monthly aggregates via `/transaction/summary/monthly`.
+- Category CRUD: create, list and delete categories (`/categories`).
+- Authentication endpoints: register, login and `GET /auth/me` to retrieve the current user.
+- Frontend improvements: `ProtectedRoute` for authenticated-only routes, an Axios `api` client with `setAuthToken()` helper, and token storage in `localStorage` for development.
+
+
 ## Tech stack
 
 - Backend: FastAPI, SQLAlchemy, SQLite, JWT auth
