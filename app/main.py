@@ -24,11 +24,6 @@ app.add_middleware(
 #create models for tables
 Base.metadata.create_all(bind=engine)
 
-# If a frontend build exists, serve it as static files (convenience for demo/CV deployments)
-FRONTEND_BUILD_DIR = os.getenv("FRONTEND_BUILD_DIR", str(Path(__file__).resolve().parent.parent / "frontend" / "dist"))
-if Path(FRONTEND_BUILD_DIR).exists():
-    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
-
 #import and include routers
 from app.routes import auth as auth_router 
 app.include_router(auth_router.router)
@@ -39,7 +34,8 @@ app.include_router(categories_router.router)
 from app.routes import transactions as transactions_router
 app.include_router(transactions_router.router)
 
-@app.get("/")
-def root():
-    return {"message": "Hello Finance Tracker GG!"}
+# Mount static files LAST (so API routes take precedence)
+FRONTEND_BUILD_DIR = os.getenv("FRONTEND_BUILD_DIR", str(Path(__file__).resolve().parent.parent / "frontend" / "dist"))
+if Path(FRONTEND_BUILD_DIR).exists():
+    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
 
