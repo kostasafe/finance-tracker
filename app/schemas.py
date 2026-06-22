@@ -7,7 +7,7 @@ from datetime import date
 
 class UserCreate(BaseModel):
     username: constr(min_length=3, max_length=64)
-    email: EmailStr
+    email: Optional[EmailStr] = None
     password: constr(min_length=6)
 
 class UserLogin(BaseModel):

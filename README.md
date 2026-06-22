@@ -60,6 +60,19 @@ npm run dev
 
 Open the app in your browser at `http://localhost:5173`.
 
+### Docker (quick demo for CV)
+
+Build and run the backend with Docker (uses SQLite file in the project):
+
+```bash
+docker compose build
+docker compose up
+```
+
+The API will be available at `http://localhost:8000`.
+
+If you want the frontend to be served by the backend, run the frontend build (`cd frontend && npm run build`) and set `FRONTEND_BUILD_DIR=frontend/dist` in `.env` or in the `docker-compose.yml` environment before starting the container.
+
 ## Configuration
 
 Create a `.env` file in the project root to override defaults.
