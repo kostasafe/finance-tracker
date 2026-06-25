@@ -25,7 +25,7 @@ def get_db():
 
 # Create transaction
 # -------------------------
-@router.post("/", response_model=TransactionOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TransactionOut, status_code=status.HTTP_201_CREATED)
 def create_transaction(
     transaction_in: TransactionCreate,
     db: Session = Depends(get_db),
@@ -61,7 +61,7 @@ def create_transaction(
 # List user transactions
 # -------------------------
 
-@router.get("/", response_model=list[TransactionOut])
+@router.get("", response_model=list[TransactionOut])
 def list_transactions(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
@@ -183,7 +183,7 @@ def transaction_summary(
 ):
     base_query = (
         db.query(Transaction)
-        .join(Category)
+        .outerjoin(Category)
         .filter(Transaction.user_id == current_user.id)
     )
 
@@ -242,7 +242,7 @@ def monthly_transaction_summary(
                 0
             ).label("total_expense"),
         )
-        .join(Category)
+        .outerjoin(Category)
         .filter(Transaction.user_id == current_user.id)
         .group_by("year", "month")
         .order_by("year", "month")

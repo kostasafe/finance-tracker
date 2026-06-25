@@ -19,7 +19,7 @@ def get_db():
         db.close()
 
 
-@router.post("/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
 def create_category(
     category_in: CategoryCreate,
     db: Session = Depends(get_db),
@@ -32,7 +32,7 @@ def create_category(
     return category
 
 
-@router.get("/", response_model=list[CategoryOut])
+@router.get("", response_model=list[CategoryOut])
 def list_categories(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
